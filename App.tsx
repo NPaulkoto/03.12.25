@@ -158,18 +158,12 @@ function App() {
 
         const scaledParams: ControlParams = JSON.parse(JSON.stringify(params));
 
-        // Scale Orbs
-        // Apply "Perceptual Boost" to blur and radius for high-res export.
-        // We drastically overdrive the blur (4.2x) to ensure the 1080p export retains the "creamy" look
-        // correcting for the "missing 20%" softness.
-        const BLUR_BOOST = 4.2; 
-        const RADIUS_BOOST = 1.45;
-
+        // Scale Orbs - LINEAR SCALING ONLY (Removed Boosts)
         const scaleOrb = (o: Orb) => ({
             ...o,
-            radiusX: scaleVal(o.radiusX) * RADIUS_BOOST,
-            radiusY: scaleVal(o.radiusY) * RADIUS_BOOST,
-            blur: scaleVal(o.blur) * BLUR_BOOST
+            radiusX: scaleVal(o.radiusX),
+            radiusY: scaleVal(o.radiusY),
+            blur: scaleVal(o.blur)
         });
         scaledParams.backgroundOrbs = scaledParams.backgroundOrbs.map(scaleOrb);
         scaledParams.foregroundOrbs = scaledParams.foregroundOrbs.map(scaleOrb);
