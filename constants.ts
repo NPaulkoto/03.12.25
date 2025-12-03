@@ -34,30 +34,29 @@ const createOrb = (id: string, name: string, x: number, y: number, color: string
     type: 'solid'
 });
 
-// SCALED PRESETS (x2.7) for 1080p Logical Coordinates
 export const SILHOUETTE_PRESETS = [
-    // 1. Solid
-    { strokeScale: 1.00, strokeWidth: 27, blurStart: 108, strokeWidthMid: 14, blurMid: 108, strokeWidthEnd: 3, blurEnd: 27, opacity: 0.80 },
-    // 2. Solid
-    { strokeScale: 1.20, strokeWidth: 68, blurStart: 68, strokeWidthMid: 54, blurMid: 27, strokeWidthEnd: 3, blurEnd: 68, opacity: 0.80 },
-    // 3. Solid
-    { strokeScale: 1.50, strokeWidth: 108, blurStart: 54, strokeWidthMid: 3, blurMid: 81, strokeWidthEnd: 3, blurEnd: 14, opacity: 0.80 },
-    // 4. Solid
-    { strokeScale: 2.00, strokeWidth: 135, blurStart: 40, strokeWidthMid: 14, blurMid: 40, strokeWidthEnd: 5, blurEnd: 54, opacity: 0.80 },
-    // 5. Solid
-    { strokeScale: 2.20, strokeWidth: 135, blurStart: 81, strokeWidthMid: 11, blurMid: 135, strokeWidthEnd: 3, blurEnd: 135, opacity: 0.80 },
+    // 1. Solid, MS: 1.00, Start(w:10, f:100->40), Mid(w:5, f:100->40), End(w:1, f:25->10), Op: 0.80
+    { strokeScale: 1.00, strokeWidth: 10, blurStart: 40, strokeWidthMid: 5, blurMid: 40, strokeWidthEnd: 1, blurEnd: 10, opacity: 0.80 },
+    // 2. Solid, MS: 1.20, Start(w:25, f:50->25), Mid(w:20, f:20->10), End(w:1, f:50->25), Op: 0.80
+    { strokeScale: 1.20, strokeWidth: 25, blurStart: 25, strokeWidthMid: 20, blurMid: 10, strokeWidthEnd: 1, blurEnd: 25, opacity: 0.80 },
+    // 3. Solid, MS: 1.50, Start(w:40, f:45->20), Mid(w:1, f:60->30), End(w:1, f:10->5), Op: 0.80
+    { strokeScale: 1.50, strokeWidth: 40, blurStart: 20, strokeWidthMid: 1, blurMid: 30, strokeWidthEnd: 1, blurEnd: 5, opacity: 0.80 },
+    // 4. Solid, MS: 2.00, Start(w:50, f:30->15), Mid(w:5, f:30->15), End(w:2, f:40->20), Op: 0.80
+    { strokeScale: 2.00, strokeWidth: 50, blurStart: 15, strokeWidthMid: 5, blurMid: 15, strokeWidthEnd: 2, blurEnd: 20, opacity: 0.80 },
+    // 5. Solid, MS: 2.20, Start(w:50, f:80->30), Mid(w:4, f:100->50), End(w:1, f:100->50), Op: 0.80
+    { strokeScale: 2.20, strokeWidth: 50, blurStart: 30, strokeWidthMid: 4, blurMid: 50, strokeWidthEnd: 1, blurEnd: 50, opacity: 0.80 },
     
-    // Derived Presets (Learned Styles)
-    // 6. The Soft Taper
-    { strokeScale: 1.80, strokeWidth: 108, blurStart: 108, strokeWidthMid: 40, blurMid: 81, strokeWidthEnd: 5, blurEnd: 27, opacity: 0.80 },
-    // 7. The Bulge
-    { strokeScale: 1.30, strokeWidth: 14, blurStart: 68, strokeWidthMid: 81, blurMid: 40, strokeWidthEnd: 14, blurEnd: 68, opacity: 0.80 },
-    // 8. The Dissolve
-    { strokeScale: 2.00, strokeWidth: 122, blurStart: 14, strokeWidthMid: 54, blurMid: 68, strokeWidthEnd: 3, blurEnd: 135, opacity: 0.80 },
-    // 9. The Fade-Away
-    { strokeScale: 1.00, strokeWidth: 40, blurStart: 0, strokeWidthMid: 40, blurMid: 68, strokeWidthEnd: 40, blurEnd: 135, opacity: 0.80 },
-    // 10. The Hourglass
-    { strokeScale: 1.50, strokeWidth: 81, blurStart: 54, strokeWidthMid: 5, blurMid: 108, strokeWidthEnd: 81, blurEnd: 54, opacity: 0.80 },
+    // Derived Presets (Learned Styles) - Scaled down blur and set opacity 0.80
+    // 6. The Soft Taper (High scale, smooth reduction)
+    { strokeScale: 1.80, strokeWidth: 40, blurStart: 40, strokeWidthMid: 15, blurMid: 30, strokeWidthEnd: 2, blurEnd: 10, opacity: 0.80 },
+    // 7. The Bulge (Thin ends, thick middle)
+    { strokeScale: 1.30, strokeWidth: 5, blurStart: 25, strokeWidthMid: 30, blurMid: 15, strokeWidthEnd: 5, blurEnd: 25, opacity: 0.80 },
+    // 8. The Dissolve (Sharp start -> Blurred/Thin end)
+    { strokeScale: 2.00, strokeWidth: 45, blurStart: 5, strokeWidthMid: 20, blurMid: 25, strokeWidthEnd: 1, blurEnd: 50, opacity: 0.80 },
+    // 9. The Fade-Away (Uniform width, progressive blur)
+    { strokeScale: 1.00, strokeWidth: 15, blurStart: 0, strokeWidthMid: 15, blurMid: 25, strokeWidthEnd: 15, blurEnd: 50, opacity: 0.80 },
+    // 10. The Hourglass (Thick ends, thin middle)
+    { strokeScale: 1.50, strokeWidth: 30, blurStart: 20, strokeWidthMid: 2, blurMid: 40, strokeWidthEnd: 30, blurEnd: 20, opacity: 0.80 },
 ];
 
 export const DEFAULT_PARAMS: ControlParams = {
@@ -69,19 +68,19 @@ export const DEFAULT_PARAMS: ControlParams = {
     gradientType: 'linear',
     color: '#F3EFEA', 
     gradientStops: defaultSilhouetteStops,
-    roundness: 11, // Scaled 4 * 2.7
+    roundness: 4, 
     backSilhouette: {
         enabled: true,
-        strokeWidth: 11,     // Scaled 4 * 2.7
-        strokeWidthMid: 32,  // Scaled 12 * 2.7
-        strokeWidthEnd: 5,   // Scaled 2 * 2.7
+        strokeWidth: 4,      
+        strokeWidthMid: 12,  
+        strokeWidthEnd: 2,   
         strokeScale: 1,
         mode: 'solid',
         color: '#FF73E5',    
         gradientStops: defaultBackSilStops,
-        blurStart: 14,       // Scaled 5 * 2.7
-        blurMid: 14,
-        blurEnd: 14,            
+        blurStart: 5,
+        blurMid: 5,
+        blurEnd: 5,            
         opacity: 0.8,        
         xOffset: 0,
         yOffset: 0
@@ -107,40 +106,40 @@ export const DEFAULT_PARAMS: ControlParams = {
     color: '#F3EFEA',
   },
   backgroundOrbs: [
-      // Scaled Radii (165 -> 445) and Blur (128 -> 345)
       // L - Large (Scale 2.0) - Bottom Right - Pink
-      { ...createOrb('bg-orb-2', 'L', 0.75, 0.75, '#FF73E5', 445, 345, 0.54), scale: 2.0 },
+      { ...createOrb('bg-orb-2', 'L', 0.75, 0.75, '#FF73E5', 165, 128, 0.54), scale: 2.0 },
       // M - Medium (Scale 1.0) - Left - Orange
-      { ...createOrb('bg-orb-1', 'M', 0.25, 0.5, '#FF9239', 445, 345, 0.54), scale: 1.0 },
+      { ...createOrb('bg-orb-1', 'M', 0.25, 0.5, '#FF9239', 165, 128, 0.54), scale: 1.0 },
       // S - Small (Scale 0.8) - Top Center - Pink
-      { ...createOrb('bg-orb-3', 'S', 0.45, 0.3, '#FF73E5', 445, 345, 0.54), scale: 0.8 },
+      { ...createOrb('bg-orb-3', 'S', 0.45, 0.3, '#FF73E5', 165, 128, 0.54), scale: 0.8 },
       // XS - Extra Small - Top Right - Orange
-      { ...createOrb('bg-orb-4', 'XS', 0.8, 0.25, '#FF9239', 445, 345, 0.54), scale: 0.575 },
+      { ...createOrb('bg-orb-4', 'XS', 0.8, 0.25, '#FF9239', 165, 128, 0.54), scale: 0.575 },
   ],
   foregroundOrbs: [
-      // Scaled Radii (200 -> 540) and Blur (88 -> 238)
       // FG 1 - Top Right - Round - Orange
       { 
-          ...createOrb('fg-orb-1', 'FG - Top Right', 0.70, 0.35, '#FF9239', 540, 238, 0.7), 
-          radiusX: 540, 
-          radiusY: 540, 
+          ...createOrb('fg-orb-1', 'FG - Top Right', 0.70, 0.35, '#FF9239', 200, 88, 0.7), 
+          radiusX: 200, 
+          radiusY: 200, 
           rotation: 45 
       },
       // FG 2 - Bottom Left - Round - Pink
       { 
-          ...createOrb('fg-orb-2', 'FG - Bottom Left', 0.30, 0.65, '#FF73E5', 540, 238, 0.7), 
-          radiusX: 540, 
-          radiusY: 540, 
+          ...createOrb('fg-orb-2', 'FG - Bottom Left', 0.30, 0.65, '#FF73E5', 200, 88, 0.7), 
+          radiusX: 200, 
+          radiusY: 200, 
           rotation: 135 
       },
   ],
   progressiveBlur: {
       enabled: false,
+      // Default: Sharp Edge on Left (0.0) -> Blurry Center (0.5)
+      // High blur (15) always in center, Low blur (0) on edge
       startX: 0.0,
       startY: 0.5,
       endX: 0.5,
       endY: 0.5,
       startBlur: 0,
-      endBlur: 40 // Scaled 15 * 2.7
+      endBlur: 15
   }
 };

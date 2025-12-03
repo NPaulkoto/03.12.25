@@ -4,9 +4,9 @@ import { ControlPanel } from './components/ControlPanel';
 import { CanvasDisplay } from './components/CanvasDisplay';
 import { DEFAULT_PARAMS, SILHOUETTE_PRESETS } from './constants';
 import type { ControlParams, Orb, GradientStop, SilhouetteLayerParams, ProgressiveBlurParams } from './types';
-import { renderAuraScene, generateSoftMask, removeBackgroundSD3 } from './utils/imageProcessing';
+import { processImage, generateSoftMask, removeBackgroundSD3 } from './utils/imageProcessing';
 
-const PARAMS_STORAGE_KEY = 'auraToolParams_v45';
+const PARAMS_STORAGE_KEY = 'auraToolParams_v43';
 
 function mergeParams(target: ControlParams, source: Partial<ControlParams>): ControlParams {
   const output: any = { ...target };
@@ -134,12 +134,12 @@ function App() {
         setIsProcessing(true);
 
         // Fixed 4:5 Output Resolution (HD)
-        const LOGICAL_WIDTH = 1080;
-        const LOGICAL_HEIGHT = 1350; 
+        const targetWidth = 1080;
+        const targetHeight = 1350; 
         
         const canvas = document.createElement('canvas');
-        canvas.width = LOGICAL_WIDTH;
-        canvas.height = LOGICAL_HEIGHT;
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         const ctx = canvas.getContext('2d');
         
         if (!ctx) {
@@ -147,12 +147,58 @@ function App() {
              return;
         }
 
-        // NO SCALING HACKS.
-        // We render exactly as defined in logical coordinates (1080p).
-        // The preview matches this because it uses a scaled transform of these exact same coords.
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        // 2. Scale Params
+        // We assume params were tuned for the current visible canvas width.
+        let scaleFactor = 1;
+        if (canvasRef.current && canvasRef.current.width > 0) {
+            scaleFactor = targetWidth / canvasRef.current.width;
+        }
 
-        renderAuraScene(ctx, LOGICAL_WIDTH, LOGICAL_HEIGHT, image, params, maskImage);
+        const scaleVal = (v: number) => v * scaleFactor;
+
+        const scaledParams: ControlParams = JSON.parse(JSON.stringify(params));
+
+        // Scale Orbs
+        // Apply "Perceptual Boost" to blur and radius for high-res export.
+        // We drastically overdrive the blur (4.2x) to ensure the 1080p export retains the "creamy" look
+        // correcting for the "missing 20%" softness.
+        const BLUR_BOOST = 4.2; 
+        const RADIUS_BOOST = 1.45;
+
+        const scaleOrb = (o: Orb) => ({
+            ...o,
+            radiusX: scaleVal(o.radiusX) * RADIUS_BOOST,
+            radiusY: scaleVal(o.radiusY) * RADIUS_BOOST,
+            blur: scaleVal(o.blur) * BLUR_BOOST
+        });
+        scaledParams.backgroundOrbs = scaledParams.backgroundOrbs.map(scaleOrb);
+        scaledParams.foregroundOrbs = scaledParams.foregroundOrbs.map(scaleOrb);
+
+        // Scale Silhouette
+        scaledParams.silhouette.roundness = scaleVal(scaledParams.silhouette.roundness);
+
+        // Scale Back Silhouette
+        if (scaledParams.silhouette.backSilhouette) {
+            scaledParams.silhouette.backSilhouette.blurStart = scaleVal(scaledParams.silhouette.backSilhouette.blurStart);
+            scaledParams.silhouette.backSilhouette.blurMid = scaleVal(scaledParams.silhouette.backSilhouette.blurMid);
+            scaledParams.silhouette.backSilhouette.blurEnd = scaleVal(scaledParams.silhouette.backSilhouette.blurEnd);
+            
+            scaledParams.silhouette.backSilhouette.strokeWidth = scaleVal(scaledParams.silhouette.backSilhouette.strokeWidth);
+            scaledParams.silhouette.backSilhouette.strokeWidthEnd = scaleVal(scaledParams.silhouette.backSilhouette.strokeWidthEnd);
+            scaledParams.silhouette.backSilhouette.strokeWidthMid = scaleVal(scaledParams.silhouette.backSilhouette.strokeWidthMid);
+            scaledParams.silhouette.backSilhouette.xOffset = scaleVal(scaledParams.silhouette.backSilhouette.xOffset);
+            scaledParams.silhouette.backSilhouette.yOffset = scaleVal(scaledParams.silhouette.backSilhouette.yOffset);
+        }
+
+        // Scale Progressive Blur
+        if (scaledParams.progressiveBlur) {
+            scaledParams.progressiveBlur.startBlur = scaleVal(scaledParams.progressiveBlur.startBlur);
+            scaledParams.progressiveBlur.endBlur = scaleVal(scaledParams.progressiveBlur.endBlur);
+        }
+
+        // 3. Render high-res frame
+        // Pass original image directly; processImage will use drawImageCover to fit it to the 4:5 canvas
+        processImage(ctx, image, scaledParams, maskImage);
 
         // 4. Download
         const link = document.createElement('a');
@@ -329,14 +375,14 @@ function App() {
             return {
                 startX: 1.0, endX: 0.5,
                 startY: 0.5, endY: 0.5,
-                startBlur: 0, endBlur: 40, // Scaled default 15 * 2.7
+                startBlur: 0, endBlur: 15,
                 enabled: true
             };
         } else {
             return {
                 startX: 0.0, endX: 0.5,
                 startY: 0.5, endY: 0.5,
-                startBlur: 0, endBlur: 40, // Scaled default 15 * 2.7
+                startBlur: 0, endBlur: 15,
                 enabled: true
             };
         }
