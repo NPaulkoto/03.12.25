@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Hush - 01 - 03.12.25",
+  "description": "An interactive tool to transform photos of people into abstract, gradient-based silhouettes with a customizable aura. Users can upload an image, and then use sliders and color pickers to control the visual style in real-time. Gemini AI can be used to suggest aesthetic parameters.",
+  "requestFramePermissions": []
+}
